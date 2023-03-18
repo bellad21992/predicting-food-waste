@@ -1,13 +1,14 @@
-import pandas
+import pandas as pd
 from datetime import datetime
+from sklearn.model_selection import cross_val_score
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 from sklearn import preprocessing
-
 
 #Duration(calculate duration)
 def duration_total(df_name,start_timecol,end_timecol):
@@ -45,13 +46,29 @@ def duration_total(df_name,start_timecol,end_timecol):
   df_name["duration"] = duration
 
 #multiple Linear regression 
-def lin_regress(df_name,df_col,waste_col, building,predict_val):
+def lin_regress(df_name,df_col,waste_col, building):
   X = []
   y = []
   for i in df_name.index:
     if df_name[["Street Address"][i]] == building:
       X += [df_name[df_col][i]]
       y += [df_name[waste_col][i]]
-  reg = LinearRegression().fit(X, y)
-  print(reg.score(X, y))
-  reg.predict(np.array([[predict_val,1000]])) #Write code to find it when its a
+  X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.4)
+  reg = LinearRegression().fit(X_train,y_train)
+  print(reg.score())
+  y_pred=reg.predict(X_test)
+  reg.predict(np.array([["TON"]])) #Write code to find it when its a ton
+
+  #Decision tree regressor
+
+def tree_regress(df_name,df_col,waste_col, building):
+  X = []
+  y = []
+  for i in df_name.index:
+    if df_name[["Street Address"][i]] == building:
+      X += [df_name[df_col][i]]
+      y += [df_name[waste_col][i]]
+  X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.4)
+  treg =  DecisionTreeRegressor(random_state=0).fit(X_train, y_train)
+  treg.score()
+  y_pred=treg.predict(X_test) #code to find y value of 1000 based on some x (2222?) 
